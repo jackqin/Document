@@ -1,1 +1,45 @@
-empty document
+Set up
+
+tar -zxvf httpd-XXX
+cd httpd-XXX
+./configure --prefix=/opt/app/apache --enable-so --enable-rewrite
+make
+make install
+
+
+*****************************************************************************************************
+Use it
+
+cd /opt/app/apache
+# ./bin/apachectl -l
+# ./bin/apachectl -V
+# ./bin/apachectl -M
+
+# ./bin/apachectl -k graceful
+# ./bin/apachectl -k start
+# ./bin/apachectl -k stop
+
+*****************************************************************************************************
+Configure it
+
+1. add one line "127.0.0.1       www.tianjie.com" into /etc/hosts
+2. Configure conf/httpd.conf as follow:
+
+ServerRoot "/opt/app/apache/"
+ServerAdmin tianjieqin@126.com
+ServerName www.tianjie.com:8080
+Listen 8080
+
+# LoadModule foo_module modules/mod_foo.so
+LoadModule proxy_module       modules/mod_proxy.so
+
+User qtj
+Group qtj
+
+<Directory "/opt/app/apache//htdocs">
+    Options FollowSymLinks
+    AllowOverride None
+    Order deny,allow
+    Deny from all
+</Directory>
+
