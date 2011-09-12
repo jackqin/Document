@@ -26,6 +26,13 @@ Configure it
 2. Configure conf/httpd.conf as follow:
 
 ServerRoot "/opt/app/apache/"
+<Directory "/opt/app/apache//htdocs">
+    Options FollowSymLinks
+    AllowOverride None
+    Order deny,allow
+    Deny from all
+</Directory>
+
 ServerAdmin tianjieqin@126.com
 ServerName www.tianjie.com:8080
 Listen 8080
@@ -36,10 +43,53 @@ LoadModule proxy_module       modules/mod_proxy.so
 User qtj
 Group qtj
 
-<Directory "/opt/app/apache//htdocs">
-    Options FollowSymLinks
+*****************************************************************************************************
+Virtual Host
+
+1. add new line "127.0.0.1       img.tianjie.com" into /etc/hosts
+2. mkdir -p /opt/dev/apache/www /opt/dev/apache/img
+3. cat index.html and add some contet for each oter
+4. configure conf/httpd.conf as follow:
+
+NameVirtualHost *:8080
+
+<VirtualHost *:8080>
+    ServerAdmin tianjieqin@126.com
+    DocumentRoot "/opt/dev/apache/www"
+    ServerName www.tianjie.com
+    ServerAlias  www.tianjie.com
+    ErrorLog "logs/www.tinajie.com-error_log"
+    CustomLog "logs/www.tianjie.com-access_log" common
+</VirtualHost>
+
+#
+# This should be changed to whatever you set DocumentRoot to.
+#
+<Directory "/opt/dev/apache/www">
+    Options Indexes FollowSymLinks
     AllowOverride None
-    Order deny,allow
-    Deny from all
+    Order allow,deny
+    Allow from all
 </Directory>
 
+
+<VirtualHost *:8080>
+    ServerAdmin tianjieqin@126.com
+    DocumentRoot "/opt/dev/apache/img"
+    ServerName img.tianjie.com
+    ServerAlias  img.tianjie.com
+    ErrorLog "logs/www.tinajie.com-error_log"
+    CustomLog "logs/www.tianjie.com-access_log" common
+</VirtualHost>
+
+#
+# This should be changed to whatever you set DocumentRoot to.
+#
+<Directory "/opt/dev/apache/img">
+    Options Indexes FollowSymLinks
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+</Directory>
+ 
+5. use http://www.tianjie.com:8080    http://img/tianjie.com:8080
