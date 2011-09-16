@@ -78,8 +78,8 @@ NameVirtualHost *:8080
     DocumentRoot "/opt/dev/apache/img"
     ServerName img.tianjie.com
     ServerAlias  img.tianjie.com
-    ErrorLog "logs/www.tinajie.com-error_log"
-    CustomLog "logs/www.tianjie.com-access_log" common
+    ErrorLog "logs/img.tianjie.com-error_log"
+    CustomLog "logs/img.tianjie.com-access_log" common
 </VirtualHost>
 
 #
@@ -93,3 +93,70 @@ NameVirtualHost *:8080
 </Directory>
  
 5. use http://www.tianjie.com:8080    http://img/tianjie.com:8080
+
+Tips: add new line "Include conf/extra/httpd-vhosts.conf" in httpd.conf to configure it use extra configure document
+
+*****************************************************************************************************
+Http Auth
+
+1. Add two users:
+      htpasswd -c auth.htpasswd qtj
+      htpasswd auth.htpasswd www 
+
+2. Add the following content:
+
+<Directory "/opt/dev/apache/www">
+        AllowOverride None
+        AuthType Basic
+        AuthName "Auth required(Basic method)."
+        AuthUserFile /opt/app/apache/auth.htpasswd
+        require valid-user
+</Directory>
+
+3. reboot apache
+
+*****************************************************************************************************
+User Proxy(httpd.conf include ===> extrx/httpd-proxy.conf)
+
+1. cd httpd setup directory(my is: /opt/software/httpd-2.2.21)
+2. cd into /opt/software/httpd-2.2.21/modules/proxy 
+3. # apxs -c -i -a mod_proxy.c mod_proxy_http.c mod_proxy_connect.c proxy_util.c
+4. make sure httpd.conf have the following two lines:
+	LoadModule proxy_module            modules/mod_proxy.so
+	LoadModule proxy_http_module       modules/mod_proxy.so
+
+5. Add the following content into configure file (use httpd.conf include  extra/httpd-proxy.conf, and modify in httpd-proxy.conf)
+
+# Use www.tianjie.com:8080 to proxy http://192.168.122.226:8080  
+# 192.168.1.188 == www.tianjie.com == 127.0.0.1
+NameVirtualHost *:8080
+
+<VirtualHost *:8080>
+        ServerAdmin tianjieqin@126.com
+        ServerName  www.tianjie.com 
+        ProxyRequests Off 
+        <Proxy *>
+                Order deny,allow
+                Deny from all 
+                #Allow from all 
+                Allow from 127.0.0.1 192.168.1.188
+        </Proxy>
+        ProxyPass / http://192.168.122.226:8080/
+        ProxyPassReverse / http://192.168.122.226:8080/
+</VirtualHost>
+
+# Use 192.168.1.188:8080 to proxy http://192.168.1.188:8082
+# Just from 192.168.122.226 can use this proxy
+# 192.168.1.188 == www.tianjie.com == 127.0.0.1
+<VirtualHost *:8080>
+        ServerAdmin tianjieqin@126.com 
+        ServerName 192.168.1.188
+        ProxyRequests Off 
+        <Proxy *>
+                Order deny,allow
+                Deny from all 
+                Allow from 192.168.122.226 
+        </Proxy>
+        ProxyPass / http://www.tianjie.com:8082/
+        ProxyPassReverse / http://www.tianjie.com:8082/
+</VirtualHost>
