@@ -1,0 +1,23 @@
+Part I:  Create pub key and scp to the server from client
+
+	cd ~/.ssh
+	ssh-keygen
+	    input file name, such as qtj_192.168.1.2
+	    got two files: qtj_192.168.1.2, qtj_192.168.1.2.pub
+	
+	scp qtj_192.168.1.2.pub tianjie@192.168.1.3:~/.ssh
+
+Part II: Setup in server side
+	cd ~/.ssh
+	cp qtj_192.168.1.2.pub authorized_keys
+	sudo /etc/init.d/ssdh restart
+
+Part III: Configure in clint side
+	vim ~/.ssh/config,  content as follow:
+		host colorcc 
+        		user tianjie
+        		hostname 192.168.1.82 
+        		port 22
+        		identityfile ~/.ssh/qtj_192.168.1.188
+
+Part IV: ssh colorcc
