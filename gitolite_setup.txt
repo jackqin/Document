@@ -141,3 +141,31 @@ All other in client
 	git add *
 	git commit -m  'Create colrcc-test project'
 	git push origin master
+
+#==================== User apache show the projects  =====================================================
+All in server side
+
+1. install apache into /opt/app/apache
+2. cd /opt/app/apache
+3. vim conf/httpd.conf
+	Listen 8080
+	ServerAdmin followfollowme@163.com
+	DocumentRoot "/opt/data/git_repos"
+	
+	<Directory "/opt/data/git_repos">
+		Options Indexes FollowSymLinks
+		AllowOverride None
+		Order allow,deny
+		Allow from all
+	</Directory>
+	
+	# Fancy directory listings
+	Include conf/extra/httpd-autoindex.conf
+
+4. vim conf/extra/httpd-autoindex.conf
+	#IndexIgnore .??* *~ *# HEADER* README* RCS CVS *,v *,t
+	IndexIgnore .??* *~ *# HEADER* RCS CVS *,v *,t
+
+5. apachectl -k graceful
+
+6. http://192.168.1.82:8080/
