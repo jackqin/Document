@@ -1,0 +1,34 @@
+1. download mysql-5.6.2-m5-linux2.6-x86_64.tar.gz
+2. tar -zxvf mysql-5.6.2-m5-linux2.6-x86_64.tar.gz
+3. mv mysql-5.6.2-m5-linux2.6-x86_64 /usr/local/mysql
+4. groupadd mysql
+5. useradd -G mysql mysql
+6. chown -R mysql mysql /usr/local/mysql
+7. cd /usr/local/mysql
+8. cp support-files/my-medium.cnf /etc/my.cnf
+9. chown -R mysql.mysql /etc/my.cnf
+10. vim /etc/my.cnf  add:
+	innodb_data_home_dir = /opt/data/mysql_data
+	innodb_log_group_home_dir = /opt/data/mysql_data 
+11. cp support-files/mysql.server /etc/init.d/mysql
+12. vim /etc/init.d/mysql   change:
+	basedir=/usr/local/mysql
+	datadir=/opt/data/mysql_data
+13. chown -R mysql.mysql /opt/data/mysql_data
+14. ./scripts/mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/opt/data/mysql_data
+15. /etc/init.d/mysql start
+
+When "Starting MySQL.. SUCCESS!" show, install is succeed done.
+
+
+Change the password. 
+	PLEASE REMEMBER TO SET A PASSWORD FOR THE MySQL root USER !
+	To do so, start the server, then issue the following commands:
+
+	/usr/local/mysql/bin/mysqladmin -u root password 'new-password'
+	/usr/local/mysql/bin/mysqladmin -u root -h colorcc password 'new-password'
+
+User it:
+	mysql -uroot -p
+	show databases;
+	create database colorcc;
