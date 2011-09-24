@@ -1,0 +1,72 @@
+#==================== Prepare: config ssh  ================================================
+Because gitolite's ssh configuration will change the ssh shell for the client user. It's better
+config ssh for the administrator can ssh from Client to Server.
+
+Suppose: Client (qtj/192.168.1.188), Server(tianjie/192.168.1.82), tianjie: gitolite admin
+
+1. [qtj]# cd ~/.ssh
+2. [qtj]# ssh-keygen  ---> do as the tips, will create two file: qtj_192.168.1.188_rsa(.pub)
+3. [qtj]# scp qtj_192.168.1.188_rsa.pub tianjie@192.168.1.82:~/.ssh
+4. [qtj]# ssh tianjie@192.168.1.82 ---> [tianjie]
+5. [tianjie]# cd ~/.ssh
+6. [tianjie]# cp qtj_192.168.1.188_rsa.pub authorized_keys
+
+do step 4 will needn't input the password
+
+7. [qtj]~/.ssh# vim config
+	host 192.168.1.82
+     		user tianjie 
+     		hostname 192.168.1.82 
+     		port 22
+     		identityfile ~/.ssh/qtj_192.168.1.188_rsa
+8. [qtj]# ssh 192.168.1.82
+#==================== Prepare: server user .bashrc include $HOME/bin  =======================
+1. [tianjie]# vim ~/.bashrc 
+2. [tianjie]# export PATH=$PATH:$HOME/bin
+3. [tianjie]# env-update && source /etc/profile
+4. [tianjie]# echo $PATH
+#==================== Setup =================================================================
+1. [qtj]# cd ~/.ssh
+2. [qtj]# ssh-keygen  ---> do as the tips, will create two file: gitolite_192.168.1.188_rsa(.pub)
+3. [qtj]# scp gitolite_192.168.1.188_rsa.pub 192.168.1.82:/tmp
+4. [qtj]# ssh 192.168.1.82 ---> [tianjie]
+
+5. [tianjie]# cd /opt/app
+6. [tianjie]# git clone git://github.com/sitaramc/gitolite
+7. [tianjie]# cd gitolite/src
+8. [tianjie]# ./gl-system-install
+9. [tianjie]# ./gl-setup /tmp/gitolite_192.168.1.188_rsa.pub
+	can modify repositories to your location, just modify $REPO_BASE="/opt/data/git_repos";
+Done
+!!!Important:
+   Because use [tianjie] to admin gitolite, it's also the login user in server,~/.ssh/authorized_keys is:
+## #gitolite start
+## no-agent-forwarding,no-x11-forwarding,no-pty,no-port-forwarding,command="/usr/bin/gl-auth-command gitolite_192.168.1.188_rsa" ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA5yGND+z5SQWs7Ygcg0bjwvstqGXV6LxSs/0LsDuSLBW6VObxSS9C6GsDR9teT7bztTS9zsFTERewwFsqVcdxMDbABKE+DiKGTY2FYRUwwc1oThz3eM7xR7ghuzJw7tFQMgdUvi57GAPRnhYuWswFcAWV4CdAndEA0Q64MYpQ1GpsiOfZlJg7i9TAEUZSeUd3SpVJeTPXGxOKrD0NiHCQ8qWo5x57OtPu4/6FdROpenExRo0UyvvI65J8KsLsUBgZjHpVJlsxBMq1PyukZu+6v6ExtNYuMcfqf4fWkRpDiEX7fdEirnbp/wwyUH7UzaW36SednYx/bkLOiUQ9oanVPw== qtj@tianjie
+## # gitolite end
+## 
+## # tianjie start
+## ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAs98PUzU3Mk15HrdSTvrdxpNFXl4fMb0rX3O1hIXa6KlRN4pM05HGx/I0qFPWfR4+ySmhiIBCa17mckLWDzUryNTjLMtmmZe9zwWWBS69DiE24zEZROnopMtA6L5mGnAfNAx8pILhXdAqpDOpM9RBp5tDkGsxBwoYy22EdUUUOY0pVXjL1VaMtL6bsKoBpnktpLo3t1lGn988F833Q4MSkFqu2tUdDUBhMkdWfYVNiOYnxc3jaLh5BLNAap2iT0tEf41qIGUF88isuFi64mBcr1wAm5AKGb6VCfriEr0xddnb9Dzsy+EFC/ZvYete9FHFlJ95hhPlDxLBO0bgP4NFkw== qtj@tianjie 
+## # tianjie end
+ when ssh from client, client user will not know tianjie's Identity, so it's better use another such as [gitolite] to admin
+gitolite, otherwise, the client should config ~/.ssh/config as follow to identity tianjie's role.
+
+		# host 192.168.1.82
+		#      user tianjie 
+		#      hostname 192.168.1.82 
+		#      port 22
+		#      identityfile ~/.ssh/qtj_192.168.1.188_rsa
+		# 
+		# host gitolite 
+		#      user tianjie 
+		#      hostname 192.168.1.82 
+		#      port 22
+		#      identityfile ~/.ssh/gitolite_192.168.1.188_rsa
+   use ssh 192.168.1.82 to ssh to the server
+   use git clone gitolite:gitolite-admin  to got the repos's project
+	
+#==================== Use it =================================================================
+1. [qtj]# cd /opt/dev/workspace
+2. [qtj]# git clone gitolite:gitolite-admin
+3. [qtj]# cd gitolite
+
+You can IDMS it.
