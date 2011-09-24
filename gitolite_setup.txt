@@ -20,11 +20,13 @@ do step 4 will needn't input the password
      		port 22
      		identityfile ~/.ssh/qtj_192.168.1.188_rsa
 8. [qtj]# ssh 192.168.1.82
+
 #==================== Prepare: server user .bashrc include $HOME/bin  =======================
 1. [tianjie]# vim ~/.bashrc 
 2. [tianjie]# export PATH=$PATH:$HOME/bin
 3. [tianjie]# env-update && source /etc/profile
 4. [tianjie]# echo $PATH
+
 #==================== Setup =================================================================
 1. [qtj]# cd ~/.ssh
 2. [qtj]# ssh-keygen  ---> do as the tips, will create two file: gitolite_192.168.1.188_rsa(.pub)
@@ -70,3 +72,72 @@ gitolite, otherwise, the client should config ~/.ssh/config as follow to identit
 3. [qtj]# cd gitolite
 
 You can IDMS it.
+
+#==================== Add new project ========================================================
+All in client
+
+1. Add my project to server
+
+	cd /opt/dev/workspace/gitolite-admin
+	vim gitolite.conf(add my project)
+		# repo    gitolite-admin
+		#         RW+     =   gitolite_192.168.1.188_rsa
+		# 
+		# repo    testing
+		#         RW+     =   @all
+		# 
+		# repo    my  
+		#         RW+     =   @all
+	git add *
+	git commit -m 'Modify to add my poject'
+	git push origin master
+
+2. Add project for client after the project was created in server
+
+	mkdir my
+	cd my
+	git init
+	git remote add origin gitolite:my.git
+	vim README --> add aa
+	git add *
+	git commit -m  'Create my project'
+	git push origin master
+
+#==================== Add a batch project =====================================================
+In server side:
+	vim ~/.gitolite.rc  modify $GL_WILDREPOS = 1;
+
+All other in client
+
+	Use regular expression, can let the user create a group, which can include many projects.
+
+1. Add the regular expression to server project
+
+	cd /opt/dev/workspace/gitolite-admin
+	vim gitolite.conf(add my project)
+		# repo    gitolite-admin
+		#         RW+     =   gitolite_192.168.1.188_rsa
+		# 
+		# repo    testing
+		#         RW+     =   @all
+		# 
+		# repo    my 
+		#         RW+     =   @all
+		# 
+		# repo    colorcc/.+
+		#         C       =   @all
+		#         RW+     =   @all
+	git add *
+	git commit -m 'Modify add regular expression projects'
+	git push origin master
+
+2. Add project for client after the project was created in server
+
+	mkdir colorcc-test
+	cd colorcc-test
+	git init
+	git remote add origin gitolite:colorcc/colorcc-test.git
+	vim README --> add aa
+	git add *
+	git commit -m  'Create colrcc-test project'
+	git push origin master
