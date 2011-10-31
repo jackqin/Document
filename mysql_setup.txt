@@ -32,3 +32,17 @@ User it:
 	mysql -uroot -p
 	show databases;
 	create database colorcc;
+
+Modify the password:
+	shell> mysql -u root
+	mysql> SET PASSWORD FOR 'root'@'localhost' = PASSWORD('newpwd');
+	mysql> SET PASSWORD FOR 'root'@'127.0.0.1' = PASSWORD('newpwd');
+	mysql> SET PASSWORD FOR 'root'@'host_name' = PASSWORD('newpwd');
+
+	shell> mysqladmin -u root password "newpwd"
+	shell> mysqladmin -u root -h host_name password "newpwd"
+	mysql> FLUSH PRIVILEGES;
+
+FAQ:
+1. ignoring user change to 'root' because the user was set to 'mysql' earlier on the command line?
+Answer: If meet the problem in Ubuntu, please modify /etc/mysql/my.cnf (Usually is /etc/my.cnf) to correct content, also set the rifht for the user(mysql). Then setup and use it.
